@@ -1,7 +1,6 @@
 const express = require('express');
 const fs = require('fs');
 
-
 const app = express();
 app.use(express.json());
 
@@ -9,7 +8,7 @@ const port = 3000;
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours =  (req, res) => {
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -17,18 +16,18 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
+};
 
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTour = (req, res) => {
   res.status(200).json({
     status: 'success',
     data: {
       tour: tours.find(el => el.id === parseInt(req.params.id)),
     },
   });
-});
+};
 
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
 
@@ -42,10 +41,15 @@ app.post('/api/v1/tours', (req, res) => {
       }
     })
   });
-});
+};
+
+app.route('/api/v1/tours/:id')
+  .get(getTour)
+
+app.route('/api/v1/tours')
+  .get(getAllTours)
+  .post(createTour);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-
